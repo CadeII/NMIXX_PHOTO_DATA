@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR 사진 업로드 - Cloudinary</title>
-  <script src="https://unpkg.com/instascan@1.0.0/build/instascan.min.js"></script>
-  <!-- Cloudinary Upload Widget -->
-  <script src="https://upload-widget.cloudinary.com/latest/global/all.js"></script>
-  <style> video, img {max-width:300px;} button {padding:10px; margin:5px;} </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudinary 이미지 업로드</title>
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        #uploaded-image { max-width: 400px; margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
 </head>
 <body>
-  <h3>QR 스캔 테스트</h3>
-  <video id="preview" style="border:1px solid #ccc;"></video>
-  <h3>Cloudinary 무료 업로드</h3>
-  <button id="upload_widget" class="cloudinary-button">📸 사진 선택 & 업로드</button>
-  <p id="result"></p>
+    <h1>이미지 업로드 (Cloudinary)</h1>
+    <button id="upload-widget">이미지 선택 및 업로드</button>
+    <div id="image-container"></div>
+    <p>업로드된 이미지 링크를 콘솔이나 사용하세요.</p>
 
-  <script>
-    // QR 스캔 (기존)
-    const scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-    scanner.addListener('scan', content => {
-      document.getElementById('result').textContent = 'QR 스캔됨: ' + content;
-    });
-    Instascan.Camera.getCameras().then(cameras => {
-      if (cameras.length > 0) scanner.start(cameras[0]);
-    });
+    <script>
+        const myWidget = cloudinary.createUploadWidget({
+            cloudName: 'dy0wgnlma',  // 실제 Cloud Name 입력
+            uploadPreset: 'Cadell',  // Unsigned preset 이름 입력
+            sources: ['local', 'url', 'camera'],  // 로컬, URL, 카메라 지원
+            multiple: false,  // 단일 업로드
+            maxFiles: 5,
+            clientAllowedFormats: ['jpg', 'png', 'gif', 'webp']
+        }, (error, result) => {
+            if (!error && result && result.event === 'success') {
+                const imageUrl = result.info.secure_url;
+                console.log('업로드된 이미지 URL:', imageUrl);  // 링크 복사 가능
+                
+                // 이미지 미리보기 표시
+                const imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.alt = '업로드된 이미지';
+                imgElement.id = 'uploaded-image';
+                imgElement.style.maxWidth = '400px';
+                imgElement.style.marginTop = '20px';
+                document.getElementById('image-container').innerHTML = '';
+                document.getElementById('image-container').appendChild(imgElement);
+            }
+        });
 
-    // Cloudinary 위젯
-    document.getElementById('upload_widget').addEventListener('click', function(){
-      const myWidget = window.cloudinary.openUploadWidget({
-        cloudName: 'dy0wgnlma',  // 여기에 cloud name 입력 (예: dabcdef123ghi)
-        uploadPreset: 'Cadell',  // 여기에 preset 이름 입력 (예: qr_upload)
-        sources: ['local', 'camera'],  // 갤러리/카메라
-        multiple: false,
-        maxFiles: 1,
-        folder: 'qr_photos'  // 폴더 지정
-      }, function(error, result) {
-        if (!error && result.event === "success") {
-          document.getElementById('result').innerHTML = 
-            `업로드 성공! <br> URL: <a href="${result.info.secure_url}" target="_blank">${result.info.secure_url}</a>`;
-        } else {
-          document.getElementById('result').textContent = '에러: ' + error?.message;
-        }
-      });
-      myWidget.open();
-    });
-  </script>
+        document.getElementById('upload-widget').addEventListener('click', () => {
+            myWidget.open();
+        }, false);
+    </script>
 </body>
 </html>
