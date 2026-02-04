@@ -3,29 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR 사진 업로드</title>
+  <title>QR 사진 업로드 - Cloudinary</title>
   <script src="https://unpkg.com/instascan@1.0.0/build/instascan.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- Cloudinary Upload Widget -->
+  <script src="https://upload-widget.cloudinary.com/latest/global/all.js"></script>
+  <style> video, img {max-width:300px;} button {padding:10px; margin:5px;} </style>
 </head>
 <body>
-  <video id="preview" width="300" height="300" style="border:1px solid #ccc;"></video>
-  <br>
-  <input type="file" id="camera" accept="image/*" capture="environment">
+  <h3>QR 스캔 테스트</h3>
+  <video id="preview" style="border:1px solid #ccc;"></video>
+  <h3>Cloudinary 무료 업로드</h3>
+  <button id="upload_widget" class="cloudinary-button">📸 사진 선택 & 업로드</button>
   <p id="result"></p>
+
   <script>
-    // QR 스캔 테스트
-    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-    scanner.addListener('scan', function(content) {
-      document.getElementById('result').innerText = 'QR: ' + content;
+    // QR 스캔 (기존)
+    const scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    scanner.addListener('scan', content => {
+      document.getElementById('result').textContent = 'QR 스캔됨: ' + content;
     });
-    Instascan.Camera.getCameras().then(function(cameras) {
+    Instascan.Camera.getCameras().then(cameras => {
       if (cameras.length > 0) scanner.start(cameras[0]);
     });
 
-    // 카메라 사진 테스트
-    document.getElementById('camera').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) document.getElementById('result').innerText = '사진: ' + file.name;
+    // Cloudinary 위젯
+    document.getElementById('upload_widget').addEventListener('click', function(){
+      const myWidget = window.cloudinary.openUploadWidget({
+        cloudName: 'dy0wgnlma',  // 여기에 cloud name 입력 (예: dabcdef123ghi)
+        uploadPreset: 'Cadell',  // 여기에 preset 이름 입력 (예: qr_upload)
+        sources: ['local', 'camera'],  // 갤러리/카메라
+        multiple: false,
+        maxFiles: 1,
+        folder: 'qr_photos'  // 폴더 지정
+      }, function(error, result) {
+        if (!error && result.event === "success") {
+          document.getElementById('result').innerHTML = 
+            `업로드 성공! <br> URL: <a href="${result.info.secure_url}" target="_blank">${result.info.secure_url}</a>`;
+        } else {
+          document.getElementById('result').textContent = '에러: ' + error?.message;
+        }
+      });
+      myWidget.open();
     });
   </script>
 </body>
