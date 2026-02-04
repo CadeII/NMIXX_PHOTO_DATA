@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR 사진 업로드</title>
+  <script src="https://unpkg.com/instascan@1.0.0/build/instascan.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+  <video id="preview" width="300" height="300" style="border:1px solid #ccc;"></video>
+  <br>
+  <input type="file" id="camera" accept="image/*" capture="environment">
+  <p id="result"></p>
+  <script>
+    // QR 스캔 테스트
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    scanner.addListener('scan', function(content) {
+      document.getElementById('result').innerText = 'QR: ' + content;
+    });
+    Instascan.Camera.getCameras().then(function(cameras) {
+      if (cameras.length > 0) scanner.start(cameras[0]);
+    });
+
+    // 카메라 사진 테스트
+    document.getElementById('camera').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) document.getElementById('result').innerText = '사진: ' + file.name;
+    });
+  </script>
+</body>
+</html>
