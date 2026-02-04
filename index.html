@@ -3,48 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudinary 이미지 업로드</title>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+    <title>Cloudinary 업로드</title>
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; }
-        #uploaded-image { max-width: 400px; margin-top: 20px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center; }
+        button { background: #007cba; color: white; border: none; padding: 12px 24px; font-size: 16px; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #005a87; }
+        #result { margin-top: 20px; }
+        img { max-width: 100%; height: auto; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>이미지 업로드 (Cloudinary)</h1>
-    <button id="upload-widget">이미지 선택 및 업로드</button>
-    <div id="image-container"></div>
-    <p>업로드된 이미지 링크를 콘솔이나 사용하세요.</p>
+    <h1>이미지 업로드 to Cloudinary</h1>
+    <p>버튼 클릭 후 이미지 선택 → 자동 저장 → URL 표시</p>
+    <button id="upload-widget">이미지 업로드</button>
+    <div id="result"></div>
 
     <script>
         const myWidget = cloudinary.createUploadWidget({
-            cloudName: 'dy0wgnlma',  // 실제 Cloud Name 입력
-            uploadPreset: 'Cadell',  // Unsigned preset 이름 입력
-            sources: ['local', 'url', 'camera'],  // 로컬, URL, 카메라 지원
-            multiple: false,  // 단일 업로드
+            cloudName: 'dy0wgnlma',  // 실제 Cloud Name
+            uploadPreset: 'Cadell',   // unsigned preset 이름 (예: github_upload)
+            sources: ['local', 'url', 'camera'],
+            multiple: false,
             maxFiles: 5,
-            clientAllowedFormats: ['jpg', 'png', 'gif', 'webp']
+            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp']
         }, (error, result) => {
-            if (!error && result && result.event === 'success') {
-                const imageUrl = result.info.secure_url;
-                console.log('업로드된 이미지 URL:', imageUrl);  // 링크 복사 가능
-                
-                // 이미지 미리보기 표시
-                const imgElement = document.createElement('img');
-                imgElement.src = imageUrl;
-                imgElement.alt = '업로드된 이미지';
-                imgElement.id = 'uploaded-image';
-                imgElement.style.maxWidth = '400px';
-                imgElement.style.marginTop = '20px';
-                document.getElementById('image-container').innerHTML = '';
-                document.getElementById('image-container').appendChild(imgElement);
+            if (!error && result.event === 'success') {
+                const url = result.info.secure_url;
+                const publicId = result.info.public_id;
+                document.getElementById('result').innerHTML = `
+                    <p><strong>저장 완료!</strong></p>
+                    <p>URL: <a href="${url}" target="_blank">${url}</a></p>
+                    <p>Public ID: ${publicId}</p>
+                    <img src="${url}" alt="업로드된 이미지" />
+                `;
+                console.log('URL:', url);  // 콘솔에서도 확인
+            } else if (error) {
+                console.error('오류:', error);
+                document.getElementById('result').innerHTML = '<p style="color:red;">오류 발생: ' + error + '</p>';
             }
         });
 
         document.getElementById('upload-widget').addEventListener('click', () => {
             myWidget.open();
-        }, false);
+        });
     </script>
 </body>
 </html>
