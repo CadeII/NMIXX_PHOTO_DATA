@@ -14,8 +14,8 @@
     </style>
 </head>
 <body>
-    <h1>이미지 업로드 to Cloudinary</h1>
-    <p>버튼 클릭 후 이미지 선택 → 자동 저장 → URL 표시</p>
+    <h1>이미지 업로드</h1>
+    <p>버튼 클릭 후 이미지 선택 → 자동 저장 </p>
     <button id="upload-widget">이미지 업로드</button>
     <div id="result"></div>
 
@@ -33,8 +33,6 @@
                 const publicId = result.info.public_id;
                 document.getElementById('result').innerHTML = `
                     <p><strong>저장 완료!</strong></p>
-                    <p>URL: <a href="${url}" target="_blank">${url}</a></p>
-                    <p>Public ID: ${publicId}</p>
                     <img src="${url}" alt="업로드된 이미지" />
                 `;
                 console.log('URL:', url);  // 콘솔에서도 확인
